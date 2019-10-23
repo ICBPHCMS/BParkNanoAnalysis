@@ -10,12 +10,14 @@
 ROOT::VecOps::RVec<bool> IsGood(unsigned int nB,
 				ROOT::VecOps::RVec<float>& pT1, ROOT::VecOps::RVec<float>& pT2, ROOT::VecOps::RVec<float>& pTk,
 				ROOT::VecOps::RVec<unsigned int> nTrg, ROOT::VecOps::RVec<float>& cos2D, ROOT::VecOps::RVec<float>& vtxP,
-				ROOT::VecOps::RVec<float>& disp, ROOT::VecOps::RVec<float>& dispU, ROOT::VecOps::RVec<float>& pT, ROOT::VecOps::RVec<float>& eta) {
+				ROOT::VecOps::RVec<float>& disp, ROOT::VecOps::RVec<float>& dispU, ROOT::VecOps::RVec<float>& pT, ROOT::VecOps::RVec<float>& eta, 
+				ROOT::VecOps::RVec<bool>& l1_ok, ROOT::VecOps::RVec<bool>& l2_ok) {
 
   ROOT::VecOps::RVec<bool> goodB(nB, false);
   for (auto ij=0; ij<nB; ++ij){
     if(pT1[ij] > 1. && pT2[ij] > 0.5 && pTk[ij] > 0.8 &&
-       nTrg[ij] > 0 && cos2D[ij] > 0.99 && vtxP[ij] > 0.1 && disp[ij] > 2 && dispU[ij] != 0 && pT[ij] > 3. && std::abs(eta[ij]) < 2.4)
+       nTrg[ij] > 0 && cos2D[ij] > 0.99 && vtxP[ij] > 0.1 && disp[ij] > 2 && dispU[ij] != 0 && 
+       pT[ij] > 3. && std::abs(eta[ij]) < 2.4 && l1_ok[ij] == true && l2_ok[ij] == true)
       goodB[ij]  = true;
   }
 
@@ -44,6 +46,7 @@ ROOT::VecOps::RVec<int> Rank(unsigned int nB,
   }
   return rank; 
 }
+
 
 
 using namespace ROOT::VecOps;
@@ -82,6 +85,8 @@ void RDF_MC_Kll_test(int isMC, int isEE){
   std::string B_mll_fullfit = isEE ? "BToKEE_mll_fullfit" : "BToKMuMu_mll_fullfit";
   std::string B_l_xy_unc = isEE ? "BToKEE_l_xy_unc" : "BToKMuMu_l_xy_unc";
   std::string B_l_xyS = isEE ? "BToKEE_l_xy/BToKEE_l_xy_unc" : "BToKMuMu_l_xy/BToKMuMu_l_xy_unc";
+  std::string B_l1_isGood = isEE ? "(RVec<bool>) (Take(Electron_isPFoverlap, BToKEE_l1Idx) == 0)" : "RVec<bool> (nBtriplet, true)"; // can add further requirements
+  std::string B_l2_isGood = isEE ? "(RVec<bool>) (Take(Electron_isPFoverlap, BToKEE_l2Idx) == 0)" : "RVec<bool> (nBtriplet, true)"; // can add further requirements
 
 
   auto n = d.Define("lumi", "luminosityBlock")
@@ -101,24 +106,31 @@ void RDF_MC_Kll_test(int isMC, int isEE){
     .Define("B_mll_llfit", B_mll_llfit.c_str())
     .Define("B_mll_fullfit", B_mll_fullfit.c_str())
     .Define("B_l_xy_unc", B_l_xy_unc.c_str())
-    .Define("B_l_xyS", B_l_xyS.c_str());
-    
+    .Define("B_l_xyS", B_l_xyS.c_str())
+    .Define("B_l1_isGood", B_l1_isGood.c_str())
+    .Define("B_l2_isGood", B_l2_isGood.c_str());
 
-  
-  auto n2 = n.Define("good_B", IsGood, {"nBtriplet", "B_l1_pT", "B_l2_pT", "B_k_pT", "nExtraTrg", "B_cos2D", "B_vtxProb", "B_l_xyS", "B_l_xy_unc", "B_pT", "B_eta"})
+
+  //  n.Foreach(InvertValue, {"B_l1_isGood"});
+
+  auto n2 = n.Define("good_B", IsGood, {"nBtriplet", "B_l1_pT", "B_l2_pT", "B_k_pT", "nExtraTrg", "B_cos2D", "B_vtxProb", "B_l_xyS", "B_l_xy_unc", "B_pT", "B_eta", 
+	"B_l1_isGood", "B_l2_isGood"})
     .Define("rankVtx", Rank, {"nBtriplet", "good_B", "B_vtxProb"});
   
 
   auto selected = n2.Filter("Any(good_B == true)", "goodB");
 
 
-  std::vector<string> listColumns = {"B_fit_mass", "good_B", "rankVtx", "B_l1_pT", "B_l2_pT", "B_k_pT", "B_l_xyS", "B_cos2D", "B_vtxProb", "B_pT", "B_eta",
-				     "B_mll_fullfit", "B_mll_llfit", "B_l_xy_unc", "nBtriplet", "event"};
+  std::vector<string> listColumns = {"B_fit_mass", "good_B", "rankVtx", 
+				     "B_l1_pT", "B_l2_pT", "B_k_pT", "B_l_xyS", "B_cos2D", "B_vtxProb", "B_pT", "B_eta",
+				     "B_mll_fullfit", "B_mll_llfit", "B_l_xy_unc", 
+				     "nBtriplet", "event", "B_l1_isGood", "B_l2_isGood"};
 
   //for(auto ij : listColumns) std::cout << ij << std::endl;
 
   if(isMC){
 
+    // 443 = JPsi    521 = B+
     std::string B_l1_genParent = isEE ? "Take(Electron_genPartFlav, BToKEE_l1Idx)" : "Take(Muon_genPartFlav, BToKMuMu_l1Idx)";
     std::string B_l2_genParent = isEE ? "Take(Electron_genPartFlav, BToKEE_l2Idx)" : "Take(Muon_genPartFlav, BToKMuMu_l2Idx)";
     std::string B_k_genParent = isEE ? "Take(ProbeTracks_genPartFlav, BToKEE_kIdx)" : "Take(ProbeTracks_genPartFlav, BToKMuMu_kIdx)";
