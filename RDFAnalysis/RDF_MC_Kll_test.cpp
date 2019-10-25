@@ -88,6 +88,7 @@ ROOT::VecOps::RVec<int> Rankv2(ROOT::VecOps::RVec<float>& vtxP){
   return rank; 
 }
 
+//using namespace ROOT::VecOps;
 
 int main(int argc, char **argv){
 
@@ -130,8 +131,8 @@ int main(int argc, char **argv){
   // can add further requirements on lepton ID
   std::string B_l1_isPF = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l1Idx)" : "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l1Idx)"; 
   std::string B_l2_isPF = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l2Idx)" : "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l2Idx)";
-  std::string B_l1_isPFoverlap = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l1Idx)" : "(ROOT::VecOps::RVec<unsigned int>) (nBtriplet_tmp, 0)"; 
-  std::string B_l2_isPFoverlap = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l2Idx)" : "(ROOT::VecOps::RVec<unsigned int>) (nBtriplet_tmp, 0)"; 
+  std::string B_l1_isPFoverlap = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l1Idx)" : "ROOT::VecOps::RVec<unsigned int> (nBtriplet_tmp, 0)"; 
+  std::string B_l2_isPFoverlap = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l2Idx)" : "ROOT::VecOps::RVec<unsigned int> (nBtriplet_tmp, 0)"; 
 
 
   auto n = d.Define("lumi", "luminosityBlock")
@@ -153,9 +154,9 @@ int main(int argc, char **argv){
     .Define("B_l_xy_unc_tmp", B_l_xy_unc.c_str())
     .Define("B_l_xyS_tmp", B_l_xyS.c_str())
     .Define("B_l1_isPF_tmp", B_l1_isPF.c_str())
-    .Define("B_l2_isPF_tmp", B_l2_isPF.c_str());
-    // .Define("B_l1_isPFoverlap_tmp", B_l1_isPFoverlap.c_str())
-    // .Define("B_l2_isPFoverlap_tmp", B_l2_isPFoverlap.c_str());
+    .Define("B_l2_isPF_tmp", B_l2_isPF.c_str())
+    .Define("B_l1_isPFoverlap_tmp", B_l1_isPFoverlap.c_str())
+    .Define("B_l2_isPFoverlap_tmp", B_l2_isPFoverlap.c_str());
 
 
   //define a branch flagging the good candidates and filter events with 0
@@ -186,8 +187,8 @@ int main(int argc, char **argv){
     .Define("B_mll_llfit", "Take(B_mll_llfit_tmp, idx_goodB)")
     .Define("B_l1_isPF", "Take(B_l1_isPF_tmp, idx_goodB)")
     .Define("B_l2_isPF", "Take(B_l2_isPF_tmp, idx_goodB)")
-    // .Define("B_l1_isPFoverlap", "Take(B_l1_isPFoverlap_tmp, idx_goodB)")
-    // .Define("B_l2_isPFoverlap", "Take(B_l2_isPFoverlap_tmp, idx_goodB)")
+    .Define("B_l1_isPFoverlap", "Take(B_l1_isPFoverlap_tmp, idx_goodB)")
+    .Define("B_l2_isPFoverlap", "Take(B_l2_isPFoverlap_tmp, idx_goodB)")
     .Define("rankVtx", Rankv2, {"B_vtxProb"})
     .Define("nBtriplet", "(unsigned int) idx_goodB.size()");
 
@@ -198,7 +199,7 @@ int main(int argc, char **argv){
 					  "B_l1_pT", "B_l2_pT", "B_k_pT", "B_l_xyS", "B_cos2D", "B_vtxProb", "B_pT", "B_eta",
 					  "B_mll_fullfit", "B_mll_llfit", "B_l_xy_unc", 
 					  "nBtriplet", "nBtriplet_tmp", "event", 
-					  "B_l1_isPF", "B_l2_isPF" /* "B_l1_isPFoverlap", "B_l2_isPFoverlap"*/};
+					  "B_l1_isPF", "B_l2_isPF", "B_l1_isPFoverlap", "B_l2_isPFoverlap"};
 
   //for(auto ij : listColumns) std::cout << ij << std::endl;
 
