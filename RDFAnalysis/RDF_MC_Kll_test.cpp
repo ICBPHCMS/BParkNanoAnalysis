@@ -1,3 +1,5 @@
+//g++ -Wall -o RDF_MC_Kll_test `root-config --cflags --glibs ` RDF_MC_Kll_test.cpp 
+
 #include <ROOT/RDataFrame.hxx>
 #include <ROOT/RVec.hxx>
 #include <iostream>
@@ -87,14 +89,14 @@ ROOT::VecOps::RVec<int> Rankv2(ROOT::VecOps::RVec<float>& vtxP){
 }
 
 
+int main(int argc, char **argv){
 
-using namespace ROOT::VecOps;
+  TStopwatch t;
+  t.Start();
 
-//root RDF_MC_Kll_test.C'()' 
-void RDF_MC_Kll_test(int isMC, int isEE){
+  int isMC = atoi(argv[1]);
+  int isEE = atoi(argv[2]);
 
-  TStopwatch t; 
-  t.Start(); 
 
   std::string inputFileList = "/eos/cms//store/group/cmst3/group/bpark/BParkingNANO_2019Oct14/";
   if(isMC && !isEE) inputFileList += "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/crab_BuToKJpsi_ToMuMu/191014_075537/0000/BParkNANO_mc_2019Oct14_*.root";
@@ -112,7 +114,7 @@ void RDF_MC_Kll_test(int isMC, int isEE){
   std::string l1Trg = isEE ? "-1" : "Take(Muon_isTriggering, BToKMuMu_l1Idx)";
   std::string l2Trg = isEE ? "-1" : "Take(Muon_isTriggering, BToKMuMu_l2Idx)";
   // for ele as nTriggerMuon flattened over triplets
-  std::string nTrg = isEE ? "RVec<unsigned int> (nBtriplet_tmp, nTriggerMuon)" : "(nTriggerMuon - B_l1_isTriggering_tmp - B_l2_isTriggering_tmp)"; 
+  std::string nTrg = isEE ? "ROOT::VecOps::RVec<unsigned int> (nBtriplet_tmp, nTriggerMuon)" : "(nTriggerMuon - B_l1_isTriggering_tmp - B_l2_isTriggering_tmp)"; 
   std::string B_l1_pT = isEE ? "Take(Electron_pt, BToKEE_l1Idx)" : "Take(Muon_pt, BToKMuMu_l1Idx)";
   std::string B_l2_pT = isEE ? "Take(Electron_pt, BToKEE_l2Idx)" : "Take(Muon_pt, BToKMuMu_l2Idx)";
   std::string B_k_pT = isEE ? "Take(ProbeTracks_pt, BToKEE_kIdx)" : "Take(ProbeTracks_pt, BToKMuMu_kIdx)";
@@ -126,10 +128,10 @@ void RDF_MC_Kll_test(int isMC, int isEE){
   std::string B_l_xy_unc = isEE ? "BToKEE_l_xy_unc" : "BToKMuMu_l_xy_unc";
   std::string B_l_xyS = isEE ? "BToKEE_l_xy/BToKEE_l_xy_unc" : "BToKMuMu_l_xy/BToKMuMu_l_xy_unc";
   // can add further requirements on lepton ID
-  std::string B_l1_isPF = isEE ? "(RVec<unsigned int>) Take(Electron_isPF, BToKEE_l1Idx)" : "(RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l1Idx)"; 
-  std::string B_l2_isPF = isEE ? "(RVec<unsigned int>) Take(Electron_isPF, BToKEE_l2Idx)" : "(RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l2Idx)";
-  // std::string B_l1_isPFoverlap = isEE ? "(RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l1Idx)" : "(RVec<unsigned int>) (nBtriplet_tmp, false)"; 
-  // std::string B_l2_isPFoverlap = isEE ? "(RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l2Idx)" : "(RVec<unsigned int>) (nBtriplet_tmp, false)"; 
+  std::string B_l1_isPF = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l1Idx)" : "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l1Idx)"; 
+  std::string B_l2_isPF = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l2Idx)" : "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l2Idx)";
+  std::string B_l1_isPFoverlap = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l1Idx)" : "(ROOT::VecOps::RVec<unsigned int>) (nBtriplet_tmp, 0)"; 
+  std::string B_l2_isPFoverlap = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l2Idx)" : "(ROOT::VecOps::RVec<unsigned int>) (nBtriplet_tmp, 0)"; 
 
 
   auto n = d.Define("lumi", "luminosityBlock")
@@ -193,10 +195,10 @@ void RDF_MC_Kll_test(int isMC, int isEE){
 
 
   std::vector<std::string> listColumns = {"B_fit_mass", "idx_goodB", "rankVtx", 
-				     "B_l1_pT", "B_l2_pT", "B_k_pT", "B_l_xyS", "B_cos2D", "B_vtxProb", "B_pT", "B_eta",
-				     "B_mll_fullfit", "B_mll_llfit", "B_l_xy_unc", 
-				     "nBtriplet", "nBtriplet_tmp", "event", 
-					  "B_l1_isPF", "B_l2_isPF" /*"B_l1_isPFoverlap", "B_l2_isPFoverlap"*/};
+					  "B_l1_pT", "B_l2_pT", "B_k_pT", "B_l_xyS", "B_cos2D", "B_vtxProb", "B_pT", "B_eta",
+					  "B_mll_fullfit", "B_mll_llfit", "B_l_xy_unc", 
+					  "nBtriplet", "nBtriplet_tmp", "event", 
+					  "B_l1_isPF", "B_l2_isPF" /* "B_l1_isPFoverlap", "B_l2_isPFoverlap"*/};
 
   //for(auto ij : listColumns) std::cout << ij << std::endl;
 
@@ -219,7 +221,7 @@ void RDF_MC_Kll_test(int isMC, int isEE){
       .Define("B_l2_genParent", "Take(B_l2_genParent_tmp, idx_goodB)")
       .Define("B_k_genParent", "Take(B_k_genParent_tmp, idx_goodB)");
     
-    mc.Snapshot("newtree", Form("newfile_isMC%d_isEE%d_nonCompiled.root", isMC, isEE), listColumns);
+    mc.Snapshot("newtree", Form("newfile_isMC%d_isEE%d.root", isMC, isEE), listColumns);
 
   }
 
@@ -229,7 +231,7 @@ void RDF_MC_Kll_test(int isMC, int isEE){
   /*add all variables needed for BDT*/
   /*maybe ?    "event"       "luminosityBlock"       "run"     */
 
-    filteresCandidates.Snapshot("newtree", Form("newfile_isMC%d_isEE%d_nonCompiled.root", isMC, isEE), listColumns);
+    filteresCandidates.Snapshot("newtree", Form("newfile_isMC%d_isEE%d.root", isMC, isEE), listColumns);
   }
 
   // your code goes here 
