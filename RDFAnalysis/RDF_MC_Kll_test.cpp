@@ -42,6 +42,33 @@ ROOT::VecOps::RVec<unsigned int> FilterGood(ROOT::VecOps::RVec<int>& good_triple
   return goodB;
 }
 
+//save indices of good candidate - to be used later for filtering 
+ROOT::VecOps::RVec<unsigned int> FilterGoodJPsimass(ROOT::VecOps::RVec<int>& good_triples, 
+						    ROOT::VecOps::RVec<float>& ll_mass, 
+						    ROOT::VecOps::RVec<unsigned int>& isEle){
+
+  ROOT::VecOps::RVec<unsigned int> goodB;
+  
+  int totN = good_triples.size();
+  float min = -99;
+  float max = -99;
+  if(totN > 0 && isEle[0] == 0){
+    min =  3.0172; //3.0964 - 3.* 0.0264;
+    max = 3.1756; //3.0964 + 3.* 0.0264;
+  }
+  else if(totN > 0 && isEle[0] == 1){
+    min =  2.9771; //3.0956 - 3.* 0.0395;
+    max = 3.2141; //3.0956 + 3.* 0.0395;
+  }
+
+  for (auto ij=0; ij<good_triples.size(); ++ij){
+    if(good_triples[ij] == 1 && min < ll_mass[ij] && ll_mass[ij] < max) 
+      goodB.push_back(ij);
+  }
+
+  return goodB;
+}
+
 
 //save for each good triplet the rank - choice is now wrt vtxCL - 
 //useful to plot just 1 triplet per event 
@@ -109,7 +136,8 @@ apply_CutBased(int isMC, ROOT::RDF::RInterface<ROOT::Detail::RDF::RLoopManager, 
     .Define("B_l2_isPFoverlap", "Take(B_l2_isPFoverlap_All, idx_goodB)")
     .Define("rankVtx", Rankv2, {"B_vtxProb"})  // should be as .Define("rankVtx", "Take(rankVtx_All, idx_goodB)")
     .Define("nBtriplet", "(unsigned int) idx_goodB.size()")
-    .Define("eventToT", "Take(eventToT_All, idx_goodB)");
+    .Define("eventToT", "Take(eventToT_All, idx_goodB)")
+    .Define("weights", "Take(weights_All, idx_goodB)");
   
   listC = {"B_fit_mass", "idx_goodB", "rankVtx", 
 	   "B_l1_pT", "B_l2_pT", "B_k_pT", "B_l_xyS", 
@@ -134,9 +162,9 @@ int main(int argc, char **argv){
   int doCutBased = atoi(argv[3]);
   int isResonant = atoi(argv[4]);
 
-  std::string inputFileList = "/eos/cms//store/group/cmst3/group/bpark/BParkingNANO_2019Oct14/";
-  if(isMC && !isEE) inputFileList += "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/crab_BuToKJpsi_ToMuMu/191014_075537/0000/BParkNANO_mc_2019Oct14_*.root";
-  else if(isMC && isEE) inputFileList += "BuToKJpsi_Toee_Mufilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/crab_BuToKJpsi_Toee/191014_075238/0000/BParkNANO_mc_2019Oct14_*.root";
+  std::string inputFileList = "/eos/cms//store/group/cmst3/group/bpark/BParkingNANO_2019Oct25/";
+  if(isMC && !isEE) inputFileList += "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/crab_BuToKJpsi_ToMuMu/191025_125744/0000/BParkNANO_mc_2019Oct25_*.root";
+  else if(isMC && isEE) inputFileList += "BuToKJpsi_Toee_Mufilter_SoftQCDnonD_TuneCP5_13TeV-pythia8-evtgen/crab_BuToKJpsi_Toee/191025_125913/0000/BParkNANO_mc_2019Oct25_*.root";
 
 
   std::cout << " isMC = " << isMC << "isEE = " << isEE << std::endl;
@@ -148,7 +176,7 @@ int main(int argc, char **argv){
   ROOT::RDataFrame d("Events", inputFileList.c_str());
 
   std::string nB = isEE ? "nBToKEE" : "nBToKMuMu";
-  std::string isElectronChannel = isEE ? "ROOT::VecOps::RVec<int> (nBtriplet_All, 1)" : "ROOT::VecOps::RVec<unsigned int> (nBtriplet_All, 0)";
+  std::string isElectronChannel = isEE ? "ROOT::VecOps::RVec<unsigned int> (nBtriplet_All, 1)" : "ROOT::VecOps::RVec<unsigned int> (nBtriplet_All, 0)";
   std::string event = "ROOT::VecOps::RVec<int> (nBtriplet_All, event)";
   std::string l1Trg = isEE ? "ROOT::VecOps::RVec<int> (nBtriplet_All, -1)" : "Take(Muon_isTriggering, BToKMuMu_l1Idx)";
   std::string l2Trg = isEE ? "ROOT::VecOps::RVec<int> (nBtriplet_All, -1)" : "Take(Muon_isTriggering, BToKMuMu_l2Idx)";
@@ -175,7 +203,7 @@ int main(int argc, char **argv){
                                         "ROOT::VecOps::RVec<unsigned int> (nBtriplet_All, 0)"; 
   std::string B_l2_isPFoverlap = isEE ? "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l2Idx)" : 
                                         "ROOT::VecOps::RVec<unsigned int> (nBtriplet_All, 0)"; 
-
+  std::string weights = "ROOT::VecOps::RVec<float>(nBtriplet_All, 1.)";
 
   auto n = d.Define("lumi", "luminosityBlock")
     .Define("nBtriplet_All", nB.c_str())
@@ -199,7 +227,8 @@ int main(int argc, char **argv){
     .Define("B_l1_isPF_All", B_l1_isPF.c_str())
     .Define("B_l2_isPF_All", B_l2_isPF.c_str())
     .Define("B_l1_isPFoverlap_All", B_l1_isPFoverlap.c_str())
-    .Define("B_l2_isPFoverlap_All", B_l2_isPFoverlap.c_str());
+    .Define("B_l2_isPFoverlap_All", B_l2_isPFoverlap.c_str())
+    .Define("weights_All", weights.c_str());
 
 
 
@@ -261,27 +290,6 @@ int main(int argc, char **argv){
 
 
   if(isMC){
-    // listColumns_All.push_back("B_l1_genParent_All");
-    // listColumns_All.push_back("B_l2_genParent_All");
-    // listColumns_All.push_back("B_k_genParent_All");
-    // listColumns_All.push_back("GenPart_l1_idx_All");    
-    // listColumns_All.push_back("GenPart_l2_idx_All");
-    // listColumns_All.push_back("GenPart_k_idx_All");
-    // listColumns_All.push_back("GenPart_l1_pdgId_All");    
-    // listColumns_All.push_back("GenPart_l2_pdgId_All");
-    // listColumns_All.push_back("GenPart_k_pdgId_All");
-    // listColumns_All.push_back("GenMothPart_l1_idx_All");
-    // listColumns_All.push_back("GenMothPart_l2_idx_All");
-    // listColumns_All.push_back("GenMothPart_k_idx_All");
-    // listColumns_All.push_back("GenMothPart_l1_pdgId_All");
-    // listColumns_All.push_back("GenMothPart_l2_pdgId_All");
-    // listColumns_All.push_back("GenMothPart_k_pdgId_All");
-    // listColumns_All.push_back("GenGMothPart_l1_idx_All");
-    // listColumns_All.push_back("GenGMothPart_l2_idx_All");
-    // listColumns_All.push_back("GenGMothPart_k_idx_All");
-    // listColumns_All.push_back("GenGMothPart_l1_pdgId_All");
-    // listColumns_All.push_back("GenGMothPart_l2_pdgId_All");
-    // listColumns_All.push_back("GenGMothPart_k_pdgId_All");
     listColumns_All.push_back("isGenMatched_All");
     
     
@@ -323,12 +331,6 @@ int main(int argc, char **argv){
       .Define("GenGMothPart_l2_pdgId_All", getPdg, {"GenGMothPart_l2_idx_All", "GenPart_pdgId"}) 
       .Define("GenGMothPart_k_pdgId_All", getPdg, {"GenGMothPart_k_idx_All", "GenPart_pdgId"});
 
-    //    filteredTriplets
-    /*
-      .Define("B_l1_genParent", "Take(B_l1_genParent_All, idx_goodB)")
-      .Define("B_l2_genParent", "Take(B_l2_genParent_All, idx_goodB)")
-      .Define("B_k_genParent", "Take(B_k_genParent_All, idx_goodB)");
-    */
 
     std::cout << " prima di mcGenMatched " << std::endl;
     auto mcGenMatched = mc.Define("isGenMatched_All", findGenMatch, {"GenPart_l1_pdgId_All", "GenPart_l2_pdgId_All", 
@@ -352,6 +354,45 @@ int main(int argc, char **argv){
     }
     else  mcGenMatched.Snapshot("newtree", Form("newfile_isMC%d_isEE%d_All.root", isMC, isEE), listColumns_All);
     //all triplets with Mc gen matched info
+
+    //now save useful histos
+    //first just pick the gen-matched triplets
+    auto mcGenMatchedv2 = mcGenMatched.Define("idx_genMatched", FilterGood, {"isGenMatched_All"})
+      .Define("idx_genMatched_JPsibin", FilterGoodJPsimass, {"isGenMatched_All", "B_mll_fullfit_All", "isEE_All"});
+    auto mcGenMatchedFiltered = mcGenMatchedv2.Define("B_mll_fullfit_gm", "Take(B_mll_fullfit_All, idx_genMatched)")
+      .Define("B_mass_fit_gm", "Take(B_fit_mass_All, idx_genMatched)")
+      .Define("weights_gm", "Take(weights_All, idx_genMatched)")
+      .Define("B_mass_fit_gmJPsi", "Take(B_fit_mass_All, idx_genMatched_JPsibin)")
+      .Define("weights_gmJPsi", "Take(weights_All, idx_genMatched_JPsibin)");
+
+    auto JPsi_mass = mcGenMatchedFiltered.Histo1D({"JPsi_mass", "", 400, 0., 4.}, "B_mll_fullfit_gm", "weights_gm");
+    auto B_mass = mcGenMatchedFiltered.Histo1D({"B_mass", "", 200, 4., 6.}, "B_mass_fit_gm", "weights_gm");
+    auto B_mass_JPsibin = mcGenMatchedFiltered.Histo1D({"B_mass_JPsibin", "", 200, 4., 6.}, "B_mass_fit_gmJPsi", "weights_gmJPsi");
+
+    // //comparison between isPF and isLowPt for isOverlap
+    // auto JPsi_mass_1isPF = mcGenMatched.Histo1D({"JPsi_mass_1isPF", "", 400, 0., 4.}, 
+    //    "B_mll_fullfit_All[isGenMatched_All == 1 && (B_l1_isPF_All == 1 || B_l2_isPF_All == 1)]", 
+    //    "weights_All[isGenMatched_All == 1 && (B_l1_isPF_All == 1 || B_l2_isPF_All == 1)]");
+
+    // auto JPsi_mass_1isOverlap = mcGenMatched.Histo1D({"JPsi_mass_1isOverlap", "", 400, 0., 4.}, 
+    //    "B_mll_fullfit_All[isGenMatched_All == 1 && (B_l1_isPFoverlap_All == 1 || B_l2_isPFoverlap_All == 1)]", 
+    //    "weights_All[isGenMatched_All == 1 && (B_l1_isPFoverlap_All == 1] || B_l2_isPFoverlap_All == 1)]");
+
+    // auto JPsi_mass_2isOverlap = mcGenMatched.Histo1D({"JPsi_mass_1isOverlap", "", 400, 0., 4.}, 
+    //    "B_mll_fullfit_All[isGenMatched_All == 1 && (B_l1_isPFoverlap_All == 1 && B_l2_isPFoverlap_All == 1)]", 
+    //    "weights_All[isGenMatched_All == 1 && (B_l1_isPFoverlap_All == 1] && B_l2_isPFoverlap_All == 1)]");
+
+    
+    auto outHistFile = TFile::Open(Form("outFileHisto_isMC%d_isEE%d.root", isMC, isEE),"recreate");
+    outHistFile->cd();
+    JPsi_mass->Write();
+    B_mass->Write();
+    B_mass_JPsibin->Write();
+    // JPsi_mass_1isPF->Write();
+    // JPsi_mass_1isOverlap->Write();
+    // JPsi_mass_2isOverlap->Write();
+    outHistFile->Close();
+
   }//isMC
   else{
 
