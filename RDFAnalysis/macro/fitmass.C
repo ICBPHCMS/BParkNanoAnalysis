@@ -52,7 +52,7 @@
 using namespace RooFit;
 
 
-void fitmass(int isEleFinalState, std::string inFile, int isB, int isJPsiBin){
+void fitmass(int isEleFinalState, std::string inFile, int isB, int isJPsiBin, int is2PF, int is2LowPt){
 
   gROOT->Reset();
   gROOT->Macro("~/public/setStyle.C");
@@ -64,13 +64,27 @@ void fitmass(int isEleFinalState, std::string inFile, int isB, int isJPsiBin){
 
 
   TFile* inF = TFile::Open(inFile.c_str());
-
   TH1F* h_mass;
   //  TH1F* h_JPsimass;
 
-  if(isB && isJPsiBin == 0) h_mass = (TH1F*)inF->Get("B_mass")->Clone("h_mass");  
-  else if(isB == 0) h_mass = (TH1F*)inF->Get("JPsi_mass")->Clone("h_mass");  
-  else if(isB == 1 && isJPsiBin == 1) h_mass = (TH1F*)inF->Get("B_mass_JPsibin")->Clone("h_mass");  
+  // https://www.nikhef.nl/~vcroft/GettingStartedWithRooFitSWAN.html
+
+
+  if(is2PF == 0 && is2LowPt == 0){
+    if(isB && isJPsiBin == 0) h_mass = (TH1F*)inF->Get("B_mass")->Clone("h_mass");  
+    else if(isB == 0) h_mass = (TH1F*)inF->Get("JPsi_mass")->Clone("h_mass");  
+    else if(isB == 1 && isJPsiBin == 1) h_mass = (TH1F*)inF->Get("B_mass_JPsibin")->Clone("h_mass");  
+  }
+  else if(is2PF == 1 && is2LowPt == 0){
+    if(isB && isJPsiBin == 0) h_mass = (TH1F*)inF->Get("B_mass_PFPF")->Clone("h_mass");  
+    else if(isB == 0) h_mass = (TH1F*)inF->Get("JPsi_mass_PFPF")->Clone("h_mass");  
+    else if(isB == 1 && isJPsiBin == 1) h_mass = (TH1F*)inF->Get("B_mass_JPsibin_PFPF")->Clone("h_mass");  
+  }
+  else if(is2PF == 0 && is2LowPt == 1){
+    if(isB && isJPsiBin == 0) h_mass = (TH1F*)inF->Get("B_mass_LowPtLowPt")->Clone("h_mass");  
+    else if(isB == 0) h_mass = (TH1F*)inF->Get("JPsi_mass_LowPtLowPt")->Clone("h_mass");  
+    else if(isB == 1 && isJPsiBin == 1) h_mass = (TH1F*)inF->Get("B_mass_JPsibin_LowPtLowPt")->Clone("h_mass");  
+  }
 
   
 
@@ -133,6 +147,7 @@ void fitmass(int isEleFinalState, std::string inFile, int isB, int isJPsiBin){
 
   w.Print();
 
+
   //fit JPsi
   RooFitResult * rJ = model->fitTo(hMass, Minimizer("Minuit2"),Save(true));
   std::cout << "\n  >>>>>> rJ fit status = " << rJ->status() << std::endl;
@@ -192,20 +207,24 @@ void fitmass(int isEleFinalState, std::string inFile, int isB, int isJPsiBin){
   auto nBkgIntError_postFitJ = nBkgError_postFitJ * bkgIntegralJ->getVal();
   */
 
+
+
     TCanvas * cc = new TCanvas();
     cc->SetLogy(0);
     plotJ->Draw();
-
     TLatex tL;
     tL.SetNDC();
     tL.SetTextSize(0.04);
     tL.SetTextFont(42);
     tL.DrawLatex(0.65,0.8, Form("chi2 = %.1f ",chi2_J));
-    // TLatex tL2;
-    // tL2.SetNDC();
-    // tL2.SetTextSize(0.05);
-    // tL2.SetTextFont(42);
-    // tL2.DrawLatex(0.65,0.85, Form("B %.1f +/- %1.f",nBkgInt_postFitJ, nBkgIntError_postFitJ));
+    TLatex tL2;
+    tL2.SetNDC();
+    tL2.SetTextSize(0.05);
+    tL2.SetTextFont(42);
+    std::string category = "All";
+    if(is2PF) category = "PF-PF";
+    if(is2LowPt) category = "LowPt-LowPt";
+    tL2.DrawLatex(0.65,0.7, category.c_str());
 
 
     std::string outName = "plots/Bmass_MC/";
@@ -218,7 +237,12 @@ void fitmass(int isEleFinalState, std::string inFile, int isB, int isJPsiBin){
       if(isEleFinalState) outName += "ee";
       else outName += "mm";
     }
-
+    if(is2PF){
+      outName += "_2PF";
+    }
+    if(is2LowPt){
+      outName += "_2LowPt";
+    }
 
     cc->Print((outName+".png").c_str(), "png");
     gPad->SetLogy();
