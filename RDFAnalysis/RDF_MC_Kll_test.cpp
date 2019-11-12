@@ -6,6 +6,45 @@
 #include <string>
 #include "TStopwatch.h"
 #include <vector>
+#include <ROOT/RDF/RInterface.hxx>
+#include <ROOT/RDF/InterfaceUtils.hxx>
+
+
+ROOT::VecOps::RVec<int> findGenMatchExt(int& isResonant, ROOT::VecOps::RVec<int>& l1_pdgId, ROOT::VecOps::RVec<int>& l2_pdgId,
+					 ROOT::VecOps::RVec<int>& k_pdgId, ROOT::VecOps::RVec<int>& Ml1_pdgId,
+					 ROOT::VecOps::RVec<int>& Ml2_pdgId, ROOT::VecOps::RVec<int>& Mk_pdgId,
+					 ROOT::VecOps::RVec<int>& GMl1_pdgId, ROOT::VecOps::RVec<int>& GMl2_pdgId,
+					 ROOT::VecOps::RVec<int>& GMk_pdgId){
+  
+  auto totN = l1_pdgId.size();
+  ROOT::VecOps::RVec<int> matched(totN, 0);
+
+  for (auto ij=0; ij<totN; ++ij){
+ 
+    if(l1_pdgId[ij] == -1 || l2_pdgId[ij] == -1 || k_pdgId[ij] == -1) continue;
+    if(l1_pdgId[ij] != -1. * l2_pdgId[ij] || std::abs(k_pdgId[ij]) != 321) continue;
+    if(isResonant){
+      if( Ml1_pdgId[ij] == Ml2_pdgId[ij] && Ml1_pdgId[ij] == 443 &&
+        GMl2_pdgId[ij] == GMl1_pdgId[ij] && GMl1_pdgId[ij] == Mk_pdgId[ij] &&
+          std::abs(GMl1_pdgId[ij]) == 521)
+        matched[ij] = 1;
+    }
+    else if (!isResonant){
+      if(Ml1_pdgId[ij] == Ml2_pdgId[ij] && Ml2_pdgId[ij] == Mk_pdgId[ij] &&
+         std::abs(Ml1_pdgId[ij]) == 521)
+        matched[ij] = 1;
+    }
+  }
+  return matched;
+}
+
+
+
+
+int CountNperEvent(ROOT::VecOps::RVec<unsigned int>& goodIdxs){
+
+  return int(goodIdxs.size());
+}
 
 
 //flag triplet passing the selection criteria
@@ -42,6 +81,36 @@ ROOT::VecOps::RVec<unsigned int> FilterGood(ROOT::VecOps::RVec<int>& good_triple
   return goodB;
 }
 
+
+//save indices of good candidate - to be used later for filtering 
+ROOT::VecOps::RVec<unsigned int> FilterGood_2eleIsLowPt(ROOT::VecOps::RVec<unsigned int>& good_Idxs, 
+							ROOT::VecOps::RVec<unsigned int> l1_isPF, 
+							ROOT::VecOps::RVec<unsigned int> l2_isPF){
+
+  ROOT::VecOps::RVec<unsigned int> goodB;
+  for (auto ij : good_Idxs){
+    if(l1_isPF[ij] == 0 && l2_isPF[ij] == 0) 
+      goodB.push_back(ij);
+  }
+  return goodB;
+}
+
+
+//save indices of good candidate - to be used later for filtering 
+ROOT::VecOps::RVec<unsigned int> FilterGood_2eleIsPF(ROOT::VecOps::RVec<unsigned int>& good_Idxs, 
+						     ROOT::VecOps::RVec<unsigned int> l1_isPF, 
+						     ROOT::VecOps::RVec<unsigned int> l2_isPF){
+
+  ROOT::VecOps::RVec<unsigned int> goodB;
+  for (auto ij : good_Idxs){
+    if(l1_isPF[ij] == 1 && l2_isPF[ij] == 1) 
+      goodB.push_back(ij);
+  }
+
+  return goodB;
+}
+
+
 //save indices of good candidate - to be used later for filtering 
 ROOT::VecOps::RVec<unsigned int> FilterGoodJPsimass(ROOT::VecOps::RVec<int>& good_triples, 
 						    ROOT::VecOps::RVec<float>& ll_mass, 
@@ -68,6 +137,35 @@ ROOT::VecOps::RVec<unsigned int> FilterGoodJPsimass(ROOT::VecOps::RVec<int>& goo
 
   return goodB;
 }
+
+
+
+ROOT::VecOps::RVec<unsigned int> FilterGoodJPsimass_2eleIsPF(ROOT::VecOps::RVec<unsigned int>& goodIdxs, 
+							     ROOT::VecOps::RVec<unsigned int>& l1_isPF, 
+							     ROOT::VecOps::RVec<unsigned int>& l2_isPF){
+  
+  ROOT::VecOps::RVec<unsigned int> goodB;
+  
+  for(auto ij : goodIdxs){
+    if(l1_isPF[ij] == 1 && l2_isPF[ij] == 1) goodB.push_back(ij);
+  }
+  return goodB;
+}
+
+
+
+ROOT::VecOps::RVec<unsigned int> FilterGoodJPsimass_2eleIsLowPt(ROOT::VecOps::RVec<unsigned int>& goodIdxs, 
+								ROOT::VecOps::RVec<unsigned int>& l1_isPF, 
+								ROOT::VecOps::RVec<unsigned int>& l2_isPF){
+  
+  ROOT::VecOps::RVec<unsigned int> goodB;
+  
+  for(auto ij : goodIdxs){
+    if(l1_isPF[ij] == 0 && l2_isPF[ij] == 0) goodB.push_back(ij);
+  }
+  return goodB;
+}
+
 
 
 //save for each good triplet the rank - choice is now wrt vtxCL - 
@@ -206,6 +304,7 @@ int main(int argc, char **argv){
   std::string weights = "ROOT::VecOps::RVec<float>(nBtriplet_All, 1.)";
 
   auto n = d.Define("lumi", "luminosityBlock")
+    .Define("isResonant_All", ((std::string)argv[4]).c_str())
     .Define("nBtriplet_All", nB.c_str())
     .Define("isEE_All", isElectronChannel.c_str())
     .Define("eventToT_All", event.c_str())
@@ -315,7 +414,8 @@ int main(int argc, char **argv){
       .Define("GenPart_l1_idx_All", GenPart_l1_idx.c_str())
       .Define("GenPart_l2_idx_All", GenPart_l2_idx.c_str())
       .Define("GenPart_k_idx_All", GenPart_k_idx.c_str())
-      .Define("GenPart_l1_pdgId_All", getPdg, {"GenPart_l1_idx_All", "GenPart_pdgId"})
+      .Define("GenPart_l1_pdgId_All", "Take(GenPart_pdgId, GenPart_l1_idx_All)")
+      //      .Define("GenPart_l1_pdgId_All", getPdg, {"GenPart_l1_idx_All", "GenPart_pdgId"})
       .Define("GenPart_l2_pdgId_All", getPdg, {"GenPart_l2_idx_All", "GenPart_pdgId"})
       .Define("GenPart_k_pdgId_All", getPdg, {"GenPart_k_idx_All", "GenPart_pdgId"})
       .Define("GenMothPart_l1_idx_All", getPdg, {"GenPart_l1_idx_All", "GenPart_genPartIdxMother"})
@@ -333,7 +433,7 @@ int main(int argc, char **argv){
 
 
     std::cout << " prima di mcGenMatched " << std::endl;
-    auto mcGenMatched = mc.Define("isGenMatched_All", findGenMatch, {"GenPart_l1_pdgId_All", "GenPart_l2_pdgId_All", 
+    auto mcGenMatched = mc.Define("isGenMatched_All", findGenMatchExt, {"isResonant_All", "GenPart_l1_pdgId_All", "GenPart_l2_pdgId_All", 
      	  "GenPart_k_pdgId_All", "GenMothPart_l1_pdgId_All", "GenMothPart_l2_pdgId_All", "GenMothPart_k_pdgId_All", 
 	  "GenGMothPart_l1_pdgId_All", "GenGMothPart_l2_pdgId_All", "GenGMothPart_k_pdgId_All"});
 
@@ -352,22 +452,74 @@ int main(int argc, char **argv){
       filtered_mc_Gen.Snapshot("newtree", Form("newfile_isMC%d_isEE%d_CB.root", isMC, isEE), listColumns);
       //MC cut based con info sul gen matched
     }
-    else  mcGenMatched.Snapshot("newtree", Form("newfile_isMC%d_isEE%d_All.root", isMC, isEE), listColumns_All);
+    else  mcGenMatched.Snapshot("newtree", Form("newfile_isMC%d_isEE%d_dummyAll.root", isMC, isEE), listColumns_All);
     //all triplets with Mc gen matched info
 
     //now save useful histos
     //first just pick the gen-matched triplets
     auto mcGenMatchedv2 = mcGenMatched.Define("idx_genMatched", FilterGood, {"isGenMatched_All"})
-      .Define("idx_genMatched_JPsibin", FilterGoodJPsimass, {"isGenMatched_All", "B_mll_fullfit_All", "isEE_All"});
+      //      .Define("all_size", CountNperEvent, {"nBtriplet_All"})
+      .Define("idx_genMatched_size", CountNperEvent, {"idx_genMatched"})
+      .Define("idx_genMatched_JPsibin", FilterGoodJPsimass, {"isGenMatched_All", "B_mll_fullfit_All", "isEE_All"})
+      .Define("idx_genMatched_2PF", FilterGood_2eleIsPF, {"idx_genMatched", "B_l1_isPF_All", "B_l2_isPF_All"})
+      .Define("idx_genMatched_2PFsize", CountNperEvent, {"idx_genMatched_2PF"})
+      .Define("idx_genMatched_2LowPt", FilterGood_2eleIsLowPt, {"idx_genMatched", "B_l1_isPF_All", "B_l2_isPF_All"})
+      .Define("idx_genMatched_2LowPtsize", CountNperEvent, {"idx_genMatched_2LowPt"})
+      .Define("idx_genMatched_JPsibin_2PF", FilterGoodJPsimass_2eleIsPF, 
+	      {"idx_genMatched_JPsibin", "B_l1_isPF_All", "B_l2_isPF_All"})
+      .Define("idx_genMatched_JPsibin_2LowPt", FilterGoodJPsimass_2eleIsLowPt, 
+	      {"idx_genMatched_JPsibin", "B_l1_isPF_All", "B_l2_isPF_All"});
+
+
+    auto totalN  = mcGenMatchedv2.Filter("nBtriplet_All > 0").Count();
+    auto N_genMatched  = mcGenMatchedv2.Filter("idx_genMatched_size > 0").Count();
+    auto N_1triplet_genMatched  = mcGenMatchedv2.Filter("idx_genMatched_size == 1").Count();
+    auto N_2triplet_genMatched  = mcGenMatchedv2.Filter("idx_genMatched_size == 2").Count();
+    auto N_1triplet_genMatched_2PF  = mcGenMatchedv2.Filter("idx_genMatched_2PFsize == 1").Count();
+    auto N_1triplet_genMatched_2LowPt  = mcGenMatchedv2.Filter("idx_genMatched_2LowPtsize == 1").Count();
+
+    std::cout << " number of total events = " << *totalN
+      	      << " \n events with >= 1 gen matched triplet = " << *N_genMatched
+	      << " \n events with 1 gen matched triplet = " << *N_1triplet_genMatched
+	      << " \n events with 2 gen matched triplet = " << *N_2triplet_genMatched
+	      << " \n events with pf-pf 1 gen matched triplet = " << *N_1triplet_genMatched_2PF
+	      << " \n events with lowPt-lowPt 1 gen matched triplet = " << *N_1triplet_genMatched_2LowPt
+	      << std::endl;
+
     auto mcGenMatchedFiltered = mcGenMatchedv2.Define("B_mll_fullfit_gm", "Take(B_mll_fullfit_All, idx_genMatched)")
       .Define("B_mass_fit_gm", "Take(B_fit_mass_All, idx_genMatched)")
       .Define("weights_gm", "Take(weights_All, idx_genMatched)")
+      .Define("B_mll_fullfit_gm_2PF", "Take(B_mll_fullfit_All, idx_genMatched_2PF)")
+      .Define("B_mass_fit_gm_2PF", "Take(B_fit_mass_All, idx_genMatched_2PF)")
+      .Define("weights_gm_2PF", "Take(weights_All, idx_genMatched_2PF)")
+      .Define("B_mll_fullfit_gm_2LowPt", "Take(B_mll_fullfit_All, idx_genMatched_2LowPt)")
+      .Define("B_mass_fit_gm_2LowPt", "Take(B_fit_mass_All, idx_genMatched_2LowPt)")
+      .Define("weights_gm_2LowPt", "Take(weights_All, idx_genMatched_2LowPt)")
       .Define("B_mass_fit_gmJPsi", "Take(B_fit_mass_All, idx_genMatched_JPsibin)")
-      .Define("weights_gmJPsi", "Take(weights_All, idx_genMatched_JPsibin)");
+      .Define("weights_gmJPsi", "Take(weights_All, idx_genMatched_JPsibin)")
+      .Define("B_mass_fit_gmJPsi_2PF", "Take(B_fit_mass_All, idx_genMatched_JPsibin_2PF)")
+      .Define("weights_gmJPsi_2PF", "Take(weights_All, idx_genMatched_JPsibin_2PF)")
+      .Define("B_mass_fit_gmJPsi_2LowPt", "Take(B_fit_mass_All, idx_genMatched_JPsibin_2LowPt)")
+      .Define("weights_gmJPsi_2LowPt", "Take(weights_All, idx_genMatched_JPsibin_2LowPt)");
+
+
+
 
     auto JPsi_mass = mcGenMatchedFiltered.Histo1D({"JPsi_mass", "", 400, 0., 4.}, "B_mll_fullfit_gm", "weights_gm");
     auto B_mass = mcGenMatchedFiltered.Histo1D({"B_mass", "", 200, 4., 6.}, "B_mass_fit_gm", "weights_gm");
     auto B_mass_JPsibin = mcGenMatchedFiltered.Histo1D({"B_mass_JPsibin", "", 200, 4., 6.}, "B_mass_fit_gmJPsi", "weights_gmJPsi");
+    auto JPsi_mass_PFPF = mcGenMatchedFiltered.Histo1D({"JPsi_mass_PFPF", "", 400, 0., 4.}, "B_mll_fullfit_gm_2PF", "weights_gm_2PF");
+    auto B_mass_PFPF = mcGenMatchedFiltered.Histo1D({"B_mass_PFPF", "", 200, 4., 6.}, "B_mass_fit_gm_2PF", "weights_gm_2PF");
+    auto B_mass_JPsibin_PFPF = mcGenMatchedFiltered.Histo1D({"B_mass_JPsibin_PFPF", "", 200, 4., 6.}, "B_mass_fit_gmJPsi_2PF", "weights_gmJPsi_2PF");
+    auto JPsi_mass_LowPtLowPt = mcGenMatchedFiltered.Histo1D({"JPsi_mass_LowPtLowPt", "", 400, 0., 4.}, "B_mll_fullfit_gm_2LowPt", "weights_gm_2LowPt");
+    auto B_mass_LowPtLowPt = mcGenMatchedFiltered.Histo1D({"B_mass_LowPtLowPt", "", 200, 4., 6.}, "B_mass_fit_gm_2LowPt", "weights_gm_2LowPt");
+    auto B_mass_JPsibin_LowPtLowPt = mcGenMatchedFiltered.Histo1D({"B_mass_JPsibin_LowPtLowPt", "", 200, 4., 6.}, "B_mass_fit_gmJPsi_2LowPt", "weights_gmJPsi_2LowPt");
+
+    auto nTriplet_All = mcGenMatchedFiltered.Histo1D({"nTriplet_All", "", 20, 0., 20}, "nBtriplet_All");
+    auto nTriplet_GM = mcGenMatchedFiltered.Histo1D({"nTriplet_GM", "", 20, 0., 20}, "idx_genMatched_size");
+    auto nTriplet2PF_GM = mcGenMatchedFiltered.Histo1D({"nTripletPFPF_GM", "", 20, 0., 20}, "idx_genMatched_2PFsize");
+    auto nTriplet2LowPt_GM = mcGenMatchedFiltered.Histo1D({"nTriplet2LowPt_GM", "", 20, 0., 20}, "idx_genMatched_2LowPtsize");
+
 
     // //comparison between isPF and isLowPt for isOverlap
     // auto JPsi_mass_1isPF = mcGenMatched.Histo1D({"JPsi_mass_1isPF", "", 400, 0., 4.}, 
@@ -385,9 +537,23 @@ int main(int argc, char **argv){
     
     auto outHistFile = TFile::Open(Form("outFileHisto_isMC%d_isEE%d.root", isMC, isEE),"recreate");
     outHistFile->cd();
+
     JPsi_mass->Write();
     B_mass->Write();
     B_mass_JPsibin->Write();
+
+    JPsi_mass_PFPF->Write();
+    B_mass_PFPF->Write();
+    B_mass_JPsibin_PFPF->Write();
+    JPsi_mass_LowPtLowPt->Write();
+    B_mass_LowPtLowPt->Write();
+    B_mass_JPsibin_LowPtLowPt->Write();
+
+    nTriplet_All->Write();
+    nTriplet_GM->Write();
+    nTriplet2PF_GM->Write();
+    nTriplet2LowPt_GM->Write();
+
     // JPsi_mass_1isPF->Write();
     // JPsi_mass_1isOverlap->Write();
     // JPsi_mass_2isOverlap->Write();
