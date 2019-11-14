@@ -1,6 +1,6 @@
 //g++ -Wall -o RDF_MC_Kll_jobs `root-config --cflags --glibs ` RDF_MC_Kll_jobs.cpp 
 
-//./RDF_MC_Kll_jobs --JOBid (-1, 1,2..) --inList input_list.txt --isMC (0, 1) --isEE (0, 1) --isResonant (0, 1) --testFile /path/to/input_file.root
+//./RDF_MC_Kll_jobs --JOBid (-1, 1,2..) --inList input_list.txt --outFile outFileName --isMC (0, 1) --isEE (0, 1) --isResonant (0, 1) --testFile /path/to/input_file.root
 
 #include <ROOT/RDataFrame.hxx>
 #include <ROOT/RVec.hxx>
@@ -29,12 +29,13 @@ int main(int argc, char **argv){
 
   std::string JOBid = "-1";
   std::string inList = "-1";
+  std::string outFName = "-1";
   int isMC = 0;
   int isEE = 0;
   int isResonant = 0;
   std::string testFile = "-1";
 
-  parseInputs(argc, argv, JOBid, inList, isMC, isEE, isResonant, testFile);
+  parseInputs(argc, argv, JOBid, inList, outFName, isMC, isEE, isResonant, testFile);
 
   if(inList != "-1" && JOBid == "-1"){
     std::cout << " configuration ERROR => splitting file based but missing JOBid and output file path " << std::endl;
@@ -45,7 +46,7 @@ int main(int argc, char **argv){
     std::cout << " by default " << std::endl;
   }
 
-  std::cout << " inList = " << inList << " JOBid = " << JOBid << " testFile = " << testFile
+  std::cout << " inList = " << inList << " JOBid = " << JOBid << " outFName = " << outFName << " testFile = " << testFile
 	    << " isMC = " << isMC << " isEE = " << isEE << "isResonant = " << isResonant << "\n" << std::endl;
 
   std::vector<std::string> inputFileList;
@@ -331,7 +332,11 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
 
     //    mcGenMatched.Snapshot("newtree", Form("newfile_isMC%d_isEE%d_All.root", isMC, isEE), listColumns_All);
     //    mcGenMatched.Snapshot("newtree", Form("newfile_isMC%d_isEE%d_All.root", isMC, isEE), "\\b([^ ]*)(_All)");
-    mcGenMatched.Snapshot("newtree", Form("output_RDF_Kll_isMC%d_isEE%d_Job.root", isMC, isEE), "\\b([^ ]*)(_All)");
+
+    if(outFName == "-1")
+      mcGenMatched.Snapshot("newtree", Form("output_RDF_Kll_isMC%d_isEE%d_Job.root", isMC, isEE), "\\b([^ ]*)(_All)");
+    else 
+      mcGenMatched.Snapshot("newtree", outFName.c_str(), "\\b([^ ]*)(_All)");
     //all triplets with Mc gen matched info
 
   }//isMC
@@ -344,7 +349,11 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
       filtered.Snapshot("newtree", Form("newfile_isMC%d_isEE%d_CB.root", isMC, isEE), listColumns);
     }
     */
-    tree_All.Snapshot("newtree", Form("output_RDF_Kll_isMC%d_isEE%d_Job.root", isMC, isEE),  "\\b([^ ]*)(_All)");
+
+    if(outFName == "-1")
+      tree_All.Snapshot("newtree", Form("output_RDF_Kll_isMC%d_isEE%d_Job.root", isMC, isEE), "\\b([^ ]*)(_All)");
+    else
+      tree_All.Snapshot("newtree", outFName.c_str(), "\\b([^ ]*)(_All)");
   }
 
 

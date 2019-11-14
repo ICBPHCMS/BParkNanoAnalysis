@@ -10,7 +10,7 @@
 
 
 void parseInputs(int argc, char **argv,  
-		 std::string& JOBid, std::string& inList, 
+		 std::string& JOBid, std::string& inList, std::string& outF,
 		 int& isMC, int& isEE, int& isResonant, 
 		 std::string& testFile){
 
@@ -34,6 +34,18 @@ void parseInputs(int argc, char **argv,
       }
       else {
 	std::cerr << " --inList option requires one argument " << std::endl;
+        return;
+      }
+    }
+  }
+  for(int i = 1; i < argc; ++i) {
+    if(std::string(argv[i]) == "--outFile") {
+      if (i + 1 < argc) {
+        outF = argv[i+1];
+        break;
+      }
+      else {
+	std::cerr << " --outFile option requires one argument " << std::endl;
         return;
       }
     }
