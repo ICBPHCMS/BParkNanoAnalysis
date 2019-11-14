@@ -9,6 +9,88 @@
 
 
 
+void parseInputs(int argc, char **argv,  
+		 std::string& JOBid, std::string& inList, 
+		 int& isMC, int& isEE, int& isResonant, 
+		 std::string& testFile){
+
+  for(int i = 1; i < argc; ++i) {
+    if(std::string(argv[i]) == "--JOBid") {
+      if(i + 1 < argc) {
+        JOBid = argv[i+1];
+        break;
+      }
+      else {
+	std::cerr << " --JOBid option requires one argument " << std::endl;
+        return;
+      }
+    }
+  }
+  for(int i = 1; i < argc; ++i) {
+    if(std::string(argv[i]) == "--inList") {
+      if (i + 1 < argc) {
+        inList = argv[i+1];
+        break;
+      }
+      else {
+	std::cerr << " --inList option requires one argument " << std::endl;
+        return;
+      }
+    }
+  }
+  for (int i = 1; i < argc; ++i) {
+    if(std::string(argv[i]) == "--isMC") {
+      if (i + 1 < argc) {
+        isMC = atoi(argv[i+1]);
+        break;
+      }
+      else {
+	std::cerr << " --isMC option requires one argument " << std::endl;
+        return;
+      }
+    }
+  }
+  for (int i = 1; i < argc; ++i) {
+    if(std::string(argv[i]) == "--isEE") {
+      if (i + 1 < argc) {
+	isEE = atoi(argv[i+1]);
+	break;
+      }
+      else {
+	std::cerr << " --isEE option requires one argument " << std::endl;
+	return;
+      }
+    }
+  }
+  for (int i = 1; i < argc; ++i) {
+    if(std::string(argv[i]) == "--isResonant") {
+      if (i + 1 < argc) {
+	isResonant = atoi(argv[i+1]);
+	break;
+      }
+      else {
+	std::cerr << " --isEE option requires one argument " << std::endl;
+	return;
+      }
+    }
+  }
+  for (int i = 1; i < argc; ++i) {
+    if(std::string(argv[i]) == "--testFile") {
+      if (i + 1 < argc) {
+	testFile = argv[i+1];
+	break;
+      } 
+      else {
+	std::cerr << " --testFile option requires one argument " << std::endl;
+	return;
+      }
+    }
+  }
+
+  return;
+}
+
+
 int CountNperEvent(ROOT::VecOps::RVec<unsigned int>& goodIdxs){
   return int(goodIdxs.size());
 }
