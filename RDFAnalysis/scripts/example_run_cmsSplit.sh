@@ -7,4 +7,4 @@ python ~/cmsSplit.py --anType script --cfg scripts/config_data_runB.sh --tag BTo
 
 
 ##with input txt in case of simple script and JOBID needed as input
-python ~/cmsSplit_v2Condor.py --anType scriptAndJOBID --cfg ../scripts/configRunRDF.sh --tag BToKmumu_2018A2 --listquery -i list_nanoDATA_BToKmumu_2018B_A2.txt --filesperjob 20 --storeArea /eos/cms/store/user/amartell/BPrk/
+python ~/cmsSplit_v2Condor.py --anType scriptAndJOBID --cfg ../scripts/configRunRDF.sh --tag BToKmumu_2018A2 --listquery -i list_nanoDATA_BToKmumu_2018B_A2.txt --filesperjob 50 --storeArea /eos/cms/store/user/amartell/BPrk/

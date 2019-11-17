@@ -2,18 +2,24 @@
 
 //./RDF_MC_Kll_jobs --JOBid (-1, 1,2..) --inList input_list.txt --outFile outFileName --isMC (0, 1) --isEE (0, 1) --isResonant (0, 1) --testFile /path/to/input_file.root
 
-#include <ROOT/RDataFrame.hxx>
-#include <ROOT/RVec.hxx>
-#include <iostream>
-#include <string>
-#include "TStopwatch.h"
-#include <vector>
 #include <ROOT/RDF/RInterface.hxx>
 #include <ROOT/RDF/InterfaceUtils.hxx>
+#include <ROOT/RDataFrame.hxx>
+#include <ROOT/RVec.hxx>
+
+#include <iostream>
+#include <fstream>
+#include <cstdio>
+#include <cstdlib>
+
+#include "TStopwatch.h"
+#include <vector>
+#include <string>
+#include <regex>
+
 #include "interface/functions.h"
 
 
-#include <regex>
 
 //using namespace ROOT::VecOps;
 
@@ -38,8 +44,7 @@ int main(int argc, char **argv){
   parseInputs(argc, argv, JOBid, inList, outFName, isMC, isEE, isResonant, testFile);
 
   if(inList != "-1" && JOBid == "-1"){
-    std::cout << " configuration ERROR => splitting file based but missing JOBid and output file path " << std::endl;
-    return -1;
+    std::cout << " running a test => careful: splitting file based but missing JOBid and output file path " << std::endl;
   }
 
   if(inList == "-1" && testFile == "-1"){
@@ -50,17 +55,14 @@ int main(int argc, char **argv){
 	    << " isMC = " << isMC << " isEE = " << isEE << "isResonant = " << isResonant << "\n" << std::endl;
 
   std::vector<std::string> inputFileList;
-  
+
   if(inList != "-1"){
     std::string rootFileName;
     std::ifstream inFileLong;
     inFileLong.open(inList.c_str(), std::ios::in);
     while(!inFileLong.eof()){
-      if(inFileLong >> rootFileName){
-	inputFileList.push_back(rootFileName);
-	//	ch.Add(rootFileName.c_str());
-	std::cout << " adding " << rootFileName << std::endl;
-      }
+      inFileLong >> rootFileName;
+      inputFileList.push_back(rootFileName);
     }
   }
   else if(testFile != "-1"){
@@ -88,27 +90,17 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
     }
   }//defaut
 
+  inList = "-1";
+  for(auto ij : inputFileList) std::cout << " file = " << ij << std::endl;
 
-  //  for(auto ij : inputFileList) std::cout << " file = " << ij << std::endl;
 
-  //  return 10;
-  //  std::cout << " isMC = " << isMC << " isEE = " << isEE << std::endl;
-  //  std::cout << " doCutBased = " << doCutBased << " isResonant = " << isResonant << std::endl;
-
-  //ROOT::RDataFrame df(ch);
   ROOT::RDataFrame d("Events", inputFileList);
 
   std::string nB = isEE ? "nBToKEE" : "nBToKMuMu";
-  // std::string isElectronChannel = isEE ? "ROOT::VecOps::RVec<unsigned int> (nBtriplet_All, 1)" : 
-  //                                        "ROOT::VecOps::RVec<unsigned int> (nBtriplet_All, 0)";
-  //  std::string event = "ROOT::VecOps::RVec<int> (nBtriplet_All, event)";
   std::string l1Trg = isEE ? "ROOT::VecOps::RVec<int> (nBtriplet_All, -1)" : "Take(Muon_isTriggering, BToKMuMu_l1Idx)";
   std::string l2Trg = isEE ? "ROOT::VecOps::RVec<int> (nBtriplet_All, -1)" : "Take(Muon_isTriggering, BToKMuMu_l2Idx)";
   // for ele as nTriggerMuon flattened over triplets
   std::string nTrg = isEE ? "ROOT::VecOps::RVec<unsigned int> (nBtriplet_All, nTriggerMuon)" : "(nTriggerMuon - B_l1_isTriggering_All - B_l2_isTriggering_All)"; 
-  // std::string B_l1_pT = isEE ? "Take(Electron_pt, BToKEE_l1Idx)" : "Take(Muon_pt, BToKMuMu_l1Idx)";
-  // std::string B_l2_pT = isEE ? "Take(Electron_pt, BToKEE_l2Idx)" : "Take(Muon_pt, BToKMuMu_l2Idx)";
-  // std::string B_k_pT = isEE ? "Take(ProbeTracks_pt, BToKEE_kIdx)" : "Take(ProbeTracks_pt, BToKMuMu_kIdx)";
   std::string B_fit_mass = isEE ? "BToKEE_fit_mass" : "BToKMuMu_fit_mass";
   std::string B_fit_massErr = isEE ? "BToKEE_fit_massErr" : "BToKMuMu_fit_massErr";
   std::string B_cos2D = isEE ? "BToKEE_cos2D" : "BToKMuMu_cos2D";
@@ -186,13 +178,15 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
                                         "ROOT::VecOps::RVec<unsigned int> (nBtriplet_All, 0)"; 
   std::string weights = "ROOT::VecOps::RVec<float>(nBtriplet_All, 1.)";
 
+  
+
 
   auto n = d.Define("lumi_All", "luminosityBlock")
     .Define("eventToT_All", "event")
     .Define("run_All", "run")
 
-    .Define("isResonant_All", (std::string(argv[4])).c_str())
-    .Define("isEE_All", (std::string(argv[2])).c_str())
+    .Define("isResonant_All", Form("%d",isResonant))
+    .Define("isEE_All", Form("%d",isEE))
 
     .Define("nBtriplet_All", nB.c_str())
     .Define("B_l1_isTriggering_All", l1Trg.c_str())
@@ -233,7 +227,7 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
     .Define("B_l1_dxyE_All", B_l1_dxyE.c_str())
     .Define("B_l2_dxyE_All", B_l2_dxyE.c_str())
     .Define("B_k_dxyE_All", B_k_dxyE.c_str())
-         
+
     .Define("B_l1_isConvVeto_All", B_l1_isConvVeto.c_str())
     .Define("B_l2_isConvVeto_All", B_l2_isConvVeto.c_str())
     .Define("B_l1_seedID_All", B_l1_seedID.c_str())
@@ -249,8 +243,6 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
     .Define("B_l1_isPFoverlap_All", B_l1_isPFoverlap.c_str())
     .Define("B_l2_isPFoverlap_All", B_l2_isPFoverlap.c_str())
     .Define("weights_All", weights.c_str());
-
-  
 
   //define a branch flagging the good candidates and filter events with 0
   auto tree_All = n.Define("cutBase_goodB_All", cutBased, {"nBtriplet_All", "B_l1_pt_All", "B_l2_pt_All", "B_k_pt_All", "nExtraTrg_All", 
