@@ -128,6 +128,45 @@ ROOT::VecOps::RVec<int> cutBased(unsigned int nB,
 }
 
 
+//KEE IsGood
+ROOT::VecOps::RVec<int> KEEcut(unsigned int nB,
+			       ROOT::VecOps::RVec<float>& pT1, ROOT::VecOps::RVec<float>& pT2,
+			       ROOT::VecOps::RVec<float>& pTk,
+			       ROOT::VecOps::RVec<float>& cos2D, ROOT::VecOps::RVec<float>& vtxP,
+			       ROOT::VecOps::RVec<float>& disp, ROOT::VecOps::RVec<float>& dispU,
+			       ROOT::VecOps::RVec<float>& pT, ROOT::VecOps::RVec<float>& eta,
+			       ROOT::VecOps::RVec<unsigned int>& l1_PFoverlap, ROOT::VecOps::RVec<unsigned int>& l2_PFoverlap) {
+
+  ROOT::VecOps::RVec<int> goodB(nB, 0);
+  for(unsigned int ij=0; ij<nB; ++ij){
+    if(pT1[ij] > 1. && pT2[ij] > 0.5 && pTk[ij] > 0.8 &&
+       cos2D[ij] > 0.99 && vtxP[ij] > 0.1 && disp[ij] > 2 && dispU[ij] != 0 &&
+       pT[ij] > 3. && std::abs(eta[ij]) < 2.4 && l1_PFoverlap[ij] == 0 && l2_PFoverlap[ij] == 0)
+      goodB[ij] = 1;
+  }
+  return goodB;
+}
+
+
+//KMM IsGood
+ROOT::VecOps::RVec<int> KMMcut(unsigned int nB,
+			       ROOT::VecOps::RVec<float>& pT1, ROOT::VecOps::RVec<float>& pT2,
+			       ROOT::VecOps::RVec<float>& pTk, ROOT::VecOps::RVec<unsigned int> nTrg,
+			       ROOT::VecOps::RVec<float>& cos2D, ROOT::VecOps::RVec<float>& vtxP,
+			       ROOT::VecOps::RVec<float>& disp, ROOT::VecOps::RVec<float>& dispU,
+			       ROOT::VecOps::RVec<float>& pT, ROOT::VecOps::RVec<float>& eta) {
+
+  ROOT::VecOps::RVec<int> goodB(nB, 0);
+  for(unsigned int ij=0; ij<nB; ++ij){
+    if(pT1[ij] > 1. && pT2[ij] > 0.5 && pTk[ij] > 0.8 &&
+       nTrg[ij] > 0 && cos2D[ij] > 0.99 && vtxP[ij] > 0.1 && disp[ij] > 2 && dispU[ij] != 0 &&
+       pT[ij] > 3. && std::abs(eta[ij]) < 2.4)
+      goodB[ij] = 1;
+  }
+  return goodB;
+}
+
+
 //FilterGood
 ROOT::VecOps::RVec<unsigned int> selectGoodIdx(ROOT::VecOps::RVec<int>& goodIdxs){
 
@@ -332,7 +371,6 @@ ROOT::RDF::RInterface<ROOT::Detail::RDF::RLoopManager, void>
   //get vector with indices of good triplets
   // do not use lepton ID => to be updated                                                                                                                                          
   auto n2v2 = dt_All.Define("idx_goodB", selectGoodIdx, {"cutBase_goodB_All"});
-
   //filter branches: only save good triplets                                                                                                                              
   auto filteresCandidates = n2v2.Define("B_fit_mass", "Take(B_fit_mass_All, idx_goodB)")
     .Define("B_l1_pT", "Take(B_l1_pT_All, idx_goodB)")
@@ -354,14 +392,12 @@ ROOT::RDF::RInterface<ROOT::Detail::RDF::RLoopManager, void>
     .Define("nBtriplet", "(unsigned int) idx_goodB.size()")
     .Define("eventToT", "Take(eventToT_All, idx_goodB)")
     .Define("weights", "Take(weights_All, idx_goodB)");
-
   listC = {"B_fit_mass", "idx_goodB", "rankVtx",
            "B_l1_pT", "B_l2_pT", "B_k_pT", "B_l_xyS",
            "B_cos2D", "B_vtxProb", "B_pT", "B_eta",
            "B_mll_fullfit", "B_mll_llfit", "B_l_xy_unc",
            "nBtriplet", "eventToT", "B_l1_isPF", "B_l2_isPF",
            "B_l1_isPFoverlap", "B_l2_isPFoverlap"};
-
   return filteresCandidates;
 }
 */
