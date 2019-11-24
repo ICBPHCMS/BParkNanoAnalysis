@@ -122,35 +122,38 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
      .Define("KEE_k_eta_All", "BToKEE_fit_k_eta")
      .Define("KEE_k_phi_All", "BToKEE_fit_k_phi")
      .Define("KEE_k_pt_All", "BToKEE_fit_k_pt")
-     .Define("KEE_k_dz_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dz, BToKEE_kIdx)")
-     .Define("KEE_k_dzE_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dzS, BToKEE_kIdx)")
-     .Define("KEE_k_dxy_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dxy, BToKEE_kIdx)")
-     .Define("KEE_k_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dxyS, BToKEE_kIdx)")
-     .Define("KEE_k_isPck_All", "(ROOT::VecOps::RVec<unsigned int>) Take(ProbeTracks_isPacked, BToKEE_kIdx)")
+     .Define("KEE_k_dz_All", "Take(ProbeTracks_dz, BToKEE_kIdx)")
+     .Define("KEE_k_dzE_All", "Take(ProbeTracks_dzS, BToKEE_kIdx)")
+     .Define("KEE_k_dxy_All", "Take(ProbeTracks_dxy, BToKEE_kIdx)")
+     .Define("KEE_k_dxyE_All", "Take(ProbeTracks_dxyS, BToKEE_kIdx)")
+     .Define("KEE_k_isPck_All", "Take(ProbeTracks_isPacked, BToKEE_kIdx)")//int
      .Define("e1_eta_All", "BToKEE_fit_l1_eta")
      .Define("e2_eta_All", "BToKEE_fit_l2_eta")
      .Define("e1_phi_All", "BToKEE_fit_l1_phi")
      .Define("e2_phi_All", "BToKEE_fit_l2_phi")
      .Define("e1_pt_All", "BToKEE_fit_l1_pt")
      .Define("e2_pt_All", "BToKEE_fit_l2_pt")
-     .Define("e1_dz_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dz, BToKEE_l1Idx)")
-     .Define("e2_dz_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dz, BToKEE_l2Idx)")
-     .Define("e1_dzE_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dzErr, BToKEE_l1Idx)")
-     .Define("e2_dzE_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dzErr, BToKEE_l2Idx)")
-     .Define("e1_dxy_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dxy, BToKEE_l1Idx)")
-     .Define("e2_dxy_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dxy, BToKEE_l2Idx)")
-     .Define("e1_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dxyErr, BToKEE_l1Idx)")
-     .Define("e2_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dxyErr, BToKEE_l2Idx)")
-     .Define("e1_isConvVeto_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_convVeto, BToKEE_l1Idx)")
-     .Define("e2_isConvVeto_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_convVeto, BToKEE_l2Idx)")
-     .Define("e1_seedID_All", "(ROOT::VecOps::RVec<float>) Take(Electron_unBiased, BToKEE_l1Idx)")
-     .Define("e2_seedID_All", "(ROOT::VecOps::RVec<float>) Take(Electron_unBiased, BToKEE_l2Idx)")
-     .Define("e1_mvaID_All", "(ROOT::VecOps::RVec<float>) Take(Electron_mvaId, BToKEE_l1Idx)")
-     .Define("e2_mvaID_All", "(ROOT::VecOps::RVec<float>) Take(Electron_mvaId, BToKEE_l2Idx)")
-     .Define("e1_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l1Idx)")
-     .Define("e2_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l2Idx)")
-     .Define("e1_isPFoverlap_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l1Idx)")
-     .Define("e2_isPFoverlap_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l2Idx)")    
+     .Define("e1_dz_All", "Take(Electron_dz, BToKEE_l1Idx)")
+     .Define("e2_dz_All", "Take(Electron_dz, BToKEE_l2Idx)")
+     .Define("e1_dzE_All", "Take(Electron_dzErr, BToKEE_l1Idx)")
+     .Define("e2_dzE_All", "Take(Electron_dzErr, BToKEE_l2Idx)")
+     .Define("e1_dxy_All", "Take(Electron_dxy, BToKEE_l1Idx)")
+     .Define("e2_dxy_All", "Take(Electron_dxy, BToKEE_l2Idx)")
+     .Define("e1_dxyE_All", "Take(Electron_dxyErr, BToKEE_l1Idx)")
+     .Define("e2_dxyE_All", "Take(Electron_dxyErr, BToKEE_l2Idx)")
+     .Define("e1_isConvVeto_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_convVeto, BToKEE_l1Idx)")//bool
+     .Define("e2_isConvVeto_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_convVeto, BToKEE_l2Idx)")//bool
+     .Define("e1_seedID_All", "Take(Electron_unBiased, BToKEE_l1Idx)")
+     .Define("e2_seedID_All", "Take(Electron_unBiased, BToKEE_l2Idx)")
+     .Define("e1_mvaID_All", "Take(Electron_mvaId, BToKEE_l1Idx)")
+     .Define("e2_mvaID_All", "Take(Electron_mvaId, BToKEE_l2Idx)")
+     .Define("e1_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l1Idx)")//bool
+     .Define("e2_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l2Idx)")//bool
+     .Define("e1_isLowPt_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isLowPt, BToKEE_l1Idx)")//bool
+     .Define("e2_isLowPt_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isLowPt, BToKEE_l2Idx)")//bool     
+     .Define("e1_isPFoverlap_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l1Idx)")//bool
+     .Define("e2_isPFoverlap_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l2Idx)")//bool
+     .Define("Idx_sel", bkgSB, { "nBToKEE_All", "e1_isPFoverlap_All", "e2_isPFoverlap_All",  "KEE_fit_mass_All"} )
     
      .Define("nBToKMM_All", "nBToKMuMu")
      .Define("KMM_fit_mass_All", "BToKMuMu_fit_mass")
@@ -166,36 +169,36 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
      .Define("KMM_k_eta_All", "BToKMuMu_fit_k_eta")
      .Define("KMM_k_phi_All", "BToKMuMu_fit_k_phi")
      .Define("KMM_k_pt_All", "BToKMuMu_fit_k_pt")
-     .Define("KMM_k_dz_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dz, BToKMuMu_kIdx)")
-     .Define("KMM_dzE_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dzS, BToKMuMu_kIdx)")
-     .Define("KMM_k_dxy_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dxy, BToKMuMu_kIdx)")
-     .Define("KMM_k_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dxyS, BToKMuMu_kIdx)")
-     .Define("KMM_k_isPck_All", "(ROOT::VecOps::RVec<unsigned int>) Take(ProbeTracks_isPacked, BToKMuMu_kIdx)")    
+     .Define("KMM_k_dz_All", "Take(ProbeTracks_dz, BToKMuMu_kIdx)")
+     .Define("KMM_dzE_All", "Take(ProbeTracks_dzS, BToKMuMu_kIdx)")
+     .Define("KMM_k_dxy_All", "Take(ProbeTracks_dxy, BToKMuMu_kIdx)")
+     .Define("KMM_k_dxyE_All", "Take(ProbeTracks_dxyS, BToKMuMu_kIdx)")
+     .Define("KMM_k_isPck_All", "Take(ProbeTracks_isPacked, BToKMuMu_kIdx)")//int  
      .Define("m1_eta_All", "BToKMuMu_fit_l1_eta")
      .Define("m2_eta_All", "BToKMuMu_fit_l2_eta")
      .Define("m1_phi_All", "BToKMuMu_fit_l1_phi")
      .Define("m2_phi_All", "BToKMuMu_fit_l2_phi")
      .Define("m1_pt_All", "BToKMuMu_fit_l1_pt")
      .Define("m2_pt_All", "BToKMuMu_fit_l2_pt")
-     .Define("m1_dz_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dz, BToKMuMu_l1Idx)")
-     .Define("m2_dz_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dz, BToKMuMu_l2Idx)")
-     .Define("m1_dzE_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dzErr, BToKMuMu_l1Idx)")
-     .Define("m2_dzE_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dzErr, BToKMuMu_l2Idx)")
-     .Define("m1_dxy_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dxy, BToKMuMu_l1Idx)")
-     .Define("m2_dxy_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dxy, BToKMuMu_l2Idx)")
-     .Define("m1_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dxyErr, BToKMuMu_l1Idx)")
-     .Define("m2_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dxyErr, BToKMuMu_l2Idx)")
-     .Define("m1_mvaID_All", "(ROOT::VecOps::RVec<float>) Take(Muon_mvaId, BToKMuMu_l1Idx)")
-     .Define("m2_mvaID_All", "(ROOT::VecOps::RVec<float>) Take(Muon_mvaId, BToKMuMu_l2Idx)")
-     .Define("m1_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l1Idx)")
-     .Define("m2_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l2Idx)")
-     .Define("m1_isTriggering_All", "Take(Muon_isTriggering, BToKMuMu_l1Idx)")
-     .Define("m2_isTriggering_All", "Take(Muon_isTriggering, BToKMuMu_l2Idx)")
+     .Define("m1_dz_All", "Take(Muon_dz, BToKMuMu_l1Idx)")
+     .Define("m2_dz_All", "Take(Muon_dz, BToKMuMu_l2Idx)")
+     .Define("m1_dzE_All", "Take(Muon_dzErr, BToKMuMu_l1Idx)")
+     .Define("m2_dzE_All", "Take(Muon_dzErr, BToKMuMu_l2Idx)")
+     .Define("m1_dxy_All", "Take(Muon_dxy, BToKMuMu_l1Idx)")
+     .Define("m2_dxy_All", "Take(Muon_dxy, BToKMuMu_l2Idx)")
+     .Define("m1_dxyE_All", "Take(Muon_dxyErr, BToKMuMu_l1Idx)")
+     .Define("m2_dxyE_All", "Take(Muon_dxyErr, BToKMuMu_l2Idx)")
+     .Define("m1_mvaID_All", "Take(Muon_mvaId, BToKMuMu_l1Idx)")
+     .Define("m2_mvaID_All", "Take(Muon_mvaId, BToKMuMu_l2Idx)")
+     .Define("m1_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l1Idx)")//bool
+     .Define("m2_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l2Idx)")//bool
+     .Define("m1_isTriggering_All", "Take(Muon_isTriggering, BToKMuMu_l1Idx)")//int
+     .Define("m2_isTriggering_All", "Take(Muon_isTriggering, BToKMuMu_l2Idx)")//int
      .Define("KMM_nExtraTrg_All", "(nTriggerMuon - m1_isTriggering_All - m2_isTriggering_All)");
   
     std::cout << " totN start = " << *(d.Count())
     	      << " valid KEE triplets = " << *(n.Filter("nBToKEE_All > 0").Count())
-    	      << " valid KMM triplets = " << *(n.Filter("nBToKMuMu > 0").Count()) << std::endl;
+    	      << " valid KMM triplets = " << *(n.Filter("nBToKMM_All > 0").Count()) << std::endl;
   }
   
   
@@ -216,35 +219,37 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
      .Define("KEE_k_eta_All", "BToKEE_fit_k_eta")
      .Define("KEE_k_phi_All", "BToKEE_fit_k_phi")
      .Define("KEE_k_pt_All", "BToKEE_fit_k_pt")
-     .Define("KEE_k_dz_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dz, BToKEE_kIdx)")
-     .Define("KEE_k_dzE_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dzS, BToKEE_kIdx)")
-     .Define("KEE_k_dxy_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dxy, BToKEE_kIdx)")
-     .Define("KEE_k_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dxyS, BToKEE_kIdx)")
-     .Define("KEE_k_isPck_All", "(ROOT::VecOps::RVec<unsigned int>) Take(ProbeTracks_isPacked, BToKEE_kIdx)")
+     .Define("KEE_k_dz_All", "Take(ProbeTracks_dz, BToKEE_kIdx)")
+     .Define("KEE_k_dzE_All", "Take(ProbeTracks_dzS, BToKEE_kIdx)")
+     .Define("KEE_k_dxy_All", "Take(ProbeTracks_dxy, BToKEE_kIdx)")
+     .Define("KEE_k_dxyE_All", "Take(ProbeTracks_dxyS, BToKEE_kIdx)")
+     .Define("KEE_k_isPck_All", "Take(ProbeTracks_isPacked, BToKEE_kIdx)")//int
      .Define("e1_eta_All", "BToKEE_fit_l1_eta")
      .Define("e2_eta_All", "BToKEE_fit_l2_eta")
      .Define("e1_phi_All", "BToKEE_fit_l1_phi")
      .Define("e2_phi_All", "BToKEE_fit_l2_phi")
      .Define("e1_pt_All", "BToKEE_fit_l1_pt")
      .Define("e2_pt_All", "BToKEE_fit_l2_pt")
-     .Define("e1_dz_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dz, BToKEE_l1Idx)")
-     .Define("e2_dz_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dz, BToKEE_l2Idx)")
-     .Define("e1_dzE_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dzErr, BToKEE_l1Idx)")
-     .Define("e2_dzE_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dzErr, BToKEE_l2Idx)")
-     .Define("e1_dxy_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dxy, BToKEE_l1Idx)")
-     .Define("e2_dxy_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dxy, BToKEE_l2Idx)")
-     .Define("e1_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dxyErr, BToKEE_l1Idx)")
-     .Define("e2_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(Electron_dxyErr, BToKEE_l2Idx)")
-     .Define("e1_isConvVeto_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_convVeto, BToKEE_l1Idx)")
-     .Define("e2_isConvVeto_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_convVeto, BToKEE_l2Idx)")
-     .Define("e1_seedID_All", "(ROOT::VecOps::RVec<float>) Take(Electron_unBiased, BToKEE_l1Idx)")
-     .Define("e2_seedID_All", "(ROOT::VecOps::RVec<float>) Take(Electron_unBiased, BToKEE_l2Idx)")
-     .Define("e1_mvaID_All", "(ROOT::VecOps::RVec<float>) Take(Electron_mvaId, BToKEE_l1Idx)")
-     .Define("e2_mvaID_All", "(ROOT::VecOps::RVec<float>) Take(Electron_mvaId, BToKEE_l2Idx)")
-     .Define("e1_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l1Idx)")
-     .Define("e2_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l2Idx)")
-     .Define("e1_isPFoverlap_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l1Idx)")
-     .Define("e2_isPFoverlap_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l2Idx)");
+     .Define("e1_dz_All", "Take(Electron_dz, BToKEE_l1Idx)")
+     .Define("e2_dz_All", "Take(Electron_dz, BToKEE_l2Idx)")
+     .Define("e1_dzE_All", "Take(Electron_dzErr, BToKEE_l1Idx)")
+     .Define("e2_dzE_All", "Take(Electron_dzErr, BToKEE_l2Idx)")
+     .Define("e1_dxy_All", "Take(Electron_dxy, BToKEE_l1Idx)")
+     .Define("e2_dxy_All", "Take(Electron_dxy, BToKEE_l2Idx)")
+     .Define("e1_dxyE_All", "Take(Electron_dxyErr, BToKEE_l1Idx)")
+     .Define("e2_dxyE_All", "Take(Electron_dxyErr, BToKEE_l2Idx)")
+     .Define("e1_isConvVeto_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_convVeto, BToKEE_l1Idx)")//bool
+     .Define("e2_isConvVeto_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_convVeto, BToKEE_l2Idx)")//bool
+     .Define("e1_seedID_All", "Take(Electron_unBiased, BToKEE_l1Idx)")
+     .Define("e2_seedID_All", "Take(Electron_unBiased, BToKEE_l2Idx)")
+     .Define("e1_mvaID_All", "Take(Electron_mvaId, BToKEE_l1Idx)")
+     .Define("e2_mvaID_All", "Take(Electron_mvaId, BToKEE_l2Idx)")
+     .Define("e1_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l1Idx)")//bool
+     .Define("e2_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPF, BToKEE_l2Idx)")//bool
+     .Define("e1_isLowPt_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isLowPt, BToKEE_l1Idx)")//bool
+     .Define("e2_isLowPt_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isLowPt, BToKEE_l2Idx)")//bool     
+     .Define("e1_isPFoverlap_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l1Idx)")//bool
+     .Define("e2_isPFoverlap_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Electron_isPFoverlap, BToKEE_l2Idx)");//bool
 
     std::cout << " totN start = " << *(d.Count())
 	      << " valid KEE triplets = " << *(n.Filter("nBToKEE_All > 0").Count());
@@ -268,31 +273,31 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
      .Define("KMM_k_eta_All", "BToKMuMu_fit_k_eta")
      .Define("KMM_k_phi_All", "BToKMuMu_fit_k_phi")
      .Define("KMM_k_pt_All", "BToKMuMu_fit_k_pt")
-     .Define("KMM_k_dz_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dz, BToKMuMu_kIdx)")
-     .Define("KMM_dzE_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dzS, BToKMuMu_kIdx)")
-     .Define("KMM_k_dxy_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dxy, BToKMuMu_kIdx)")
-     .Define("KMM_k_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(ProbeTracks_dxyS, BToKMuMu_kIdx)")
-     .Define("KMM_k_isPck_All", "(ROOT::VecOps::RVec<unsigned int>) Take(ProbeTracks_isPacked, BToKMuMu_kIdx)")    
+     .Define("KMM_k_dz_All", "Take(ProbeTracks_dz, BToKMuMu_kIdx)")
+     .Define("KMM_dzE_All", "Take(ProbeTracks_dzS, BToKMuMu_kIdx)")
+     .Define("KMM_k_dxy_All", "Take(ProbeTracks_dxy, BToKMuMu_kIdx)")
+     .Define("KMM_k_dxyE_All", "Take(ProbeTracks_dxyS, BToKMuMu_kIdx)")
+     .Define("KMM_k_isPck_All", "Take(ProbeTracks_isPacked, BToKMuMu_kIdx)")//int  
      .Define("m1_eta_All", "BToKMuMu_fit_l1_eta")
      .Define("m2_eta_All", "BToKMuMu_fit_l2_eta")
      .Define("m1_phi_All", "BToKMuMu_fit_l1_phi")
      .Define("m2_phi_All", "BToKMuMu_fit_l2_phi")
      .Define("m1_pt_All", "BToKMuMu_fit_l1_pt")
      .Define("m2_pt_All", "BToKMuMu_fit_l2_pt")
-     .Define("m1_dz_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dz, BToKMuMu_l1Idx)")
-     .Define("m2_dz_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dz, BToKMuMu_l2Idx)")
-     .Define("m1_dzE_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dzErr, BToKMuMu_l1Idx)")
-     .Define("m2_dzE_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dzErr, BToKMuMu_l2Idx)")
-     .Define("m1_dxy_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dxy, BToKMuMu_l1Idx)")
-     .Define("m2_dxy_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dxy, BToKMuMu_l2Idx)")
-     .Define("m1_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dxyErr, BToKMuMu_l1Idx)")
-     .Define("m2_dxyE_All", "(ROOT::VecOps::RVec<float>) Take(Muon_dxyErr, BToKMuMu_l2Idx)")
-     .Define("m1_mvaID_All", "(ROOT::VecOps::RVec<float>) Take(Muon_mvaId, BToKMuMu_l1Idx)")
-     .Define("m2_mvaID_All", "(ROOT::VecOps::RVec<float>) Take(Muon_mvaId, BToKMuMu_l2Idx)")
-     .Define("m1_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l1Idx)")
-     .Define("m2_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l2Idx)")
-     .Define("m1_isTriggering_All", "Take(Muon_isTriggering, BToKMuMu_l1Idx)")
-     .Define("m2_isTriggering_All", "Take(Muon_isTriggering, BToKMuMu_l2Idx)")
+     .Define("m1_dz_All", "Take(Muon_dz, BToKMuMu_l1Idx)")
+     .Define("m2_dz_All", "Take(Muon_dz, BToKMuMu_l2Idx)")
+     .Define("m1_dzE_All", "Take(Muon_dzErr, BToKMuMu_l1Idx)")
+     .Define("m2_dzE_All", "Take(Muon_dzErr, BToKMuMu_l2Idx)")
+     .Define("m1_dxy_All", "Take(Muon_dxy, BToKMuMu_l1Idx)")
+     .Define("m2_dxy_All", "Take(Muon_dxy, BToKMuMu_l2Idx)")
+     .Define("m1_dxyE_All", "Take(Muon_dxyErr, BToKMuMu_l1Idx)")
+     .Define("m2_dxyE_All", "Take(Muon_dxyErr, BToKMuMu_l2Idx)")
+     .Define("m1_mvaID_All", "Take(Muon_mvaId, BToKMuMu_l1Idx)")
+     .Define("m2_mvaID_All", "Take(Muon_mvaId, BToKMuMu_l2Idx)")
+     .Define("m1_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l1Idx)")//bool
+     .Define("m2_isPF_All", "(ROOT::VecOps::RVec<unsigned int>) Take(Muon_isPFcand, BToKMuMu_l2Idx)")//bool
+     .Define("m1_isTriggering_All", "Take(Muon_isTriggering, BToKMuMu_l1Idx)")//int
+     .Define("m2_isTriggering_All", "Take(Muon_isTriggering, BToKMuMu_l2Idx)")//int
      .Define("KMM_nExtraTrg_All", "(nTriggerMuon - m1_isTriggering_All - m2_isTriggering_All)");
 
     std::cout << " totN start = " << *(d.Count())
@@ -399,24 +404,29 @@ inputFileList.push_back(base + "BuToKJpsi_ToMuMu_probefilter_SoftQCDnonD_TuneCP5
 				 "GenPart_l1_phi_GenAll", "GenPart_l2_phi_GenAll", "GenPart_k_phi_GenAll",
 				 "l1_phi_all", "l2_phi_all", "k_phi_all"})
                           .Define("rank_gendR_All", flagRank, {"n_Btriplet_all", "isGenMatched_All", "dRwithGen_All"});
+                          
+    auto mcGenMatched_i = mcGenMatched;
 
+    if(isEE)
+        mcGenMatched_i = mcGenMatched.Define("Idx_sel", si3sg, { "nBToKEE_All", "e1_isPFoverlap_All", 
+                                             "e2_isPFoverlap_All",  "KEE_fit_mass_All", "rank_gendR_All"} );
 
     //give eta, phi, l1, l2, k e gen
     std::cout << "\n computed dR for genmatched " << std::endl;
 
     if(outFName == "-1")
-      mcGenMatched.Snapshot("newtree", Form("output_RDF_Kll_isMC%d_isEE%d_BDT.root", isMC, isEE), "\\b([^ ]*)(_All)");
+      mcGenMatched_i.Snapshot("newtree", Form("output_RDF_Kll_isMC%d_isEE%d_BDT.root", isMC, isEE), "\\b([^ ]*)(_All)|\\b([^ ]*)(_sel)");
     else 
-      mcGenMatched.Snapshot("newtree", outFName.c_str(), "\\b([^ ]*)(_All)");
+      mcGenMatched_i.Snapshot("newtree", outFName.c_str(), "\\b([^ ]*)(_All)|\\b([^ ]*)(_sel)");
     //all triplets with Mc gen matched info
 
   }//isMC
   else{
 
     if(outFName == "-1")
-      tree_All.Snapshot("newtree", Form("output_RDF_Kll_isMC%d_BDT.root", isMC), "\\b([^ ]*)(_All)");
+      tree_All.Snapshot("newtree", Form("output_RDF_Kll_isMC%d_BDT.root", isMC), "\\b([^ ]*)(_All)|\\b([^ ]*)(_sel)");
     else
-      tree_All.Snapshot("newtree", outFName.c_str(), "\\b([^ ]*)(_All)");
+      tree_All.Snapshot("newtree", outFName.c_str(), "\\b([^ ]*)(_All)|\\b([^ ]*)(_sel)");
   }
 
   
