@@ -167,6 +167,41 @@ ROOT::VecOps::RVec<int> KMMcut(unsigned int nB,
 }
 
 
+// Bkg SB regions
+ROOT::VecOps::RVec<unsigned int> bkgSB(unsigned int nB,
+				       ROOT::VecOps::RVec<unsigned int>& e1isPFover,
+				       ROOT::VecOps::RVec<unsigned int>& e2isPFover,
+				       ROOT::VecOps::RVec<float>& B_fit_mass){
+
+  ROOT::VecOps::RVec<unsigned int> out_idx;
+  for (unsigned int ij=0; ij<nB; ++ij){
+    if( (e1isPFover[ij] == 0 && e2isPFover[ij] == 0) &&
+        ( (B_fit_mass[ij] > 4.8947 && B_fit_mass[ij] < 5.0807) || 
+          (B_fit_mass[ij] > 5.4527 && B_fit_mass[ij] < 5.6387) ) 
+      )out_idx.push_back(ij);
+  }
+  return out_idx;
+}
+
+
+// Sig 3sigma region
+ROOT::VecOps::RVec<unsigned int> si3sg(unsigned int nB,
+				       ROOT::VecOps::RVec<unsigned int>& e1isPFover,
+				       ROOT::VecOps::RVec<unsigned int>& e2isPFover,
+				       ROOT::VecOps::RVec<float>& B_fit_mass,
+				       ROOT::VecOps::RVec<int>& rank){
+
+  ROOT::VecOps::RVec<unsigned int> out_idx;
+  for (unsigned int ij=0; ij<nB; ++ij){
+    if( (e1isPFover[ij] == 0 && e2isPFover[ij] == 0) &&
+        (B_fit_mass[ij] > 5.0807 && B_fit_mass[ij] < 5.4527) &&
+	rank[ij] == 0
+      )out_idx.push_back(ij);
+  }
+  return out_idx;
+}
+
+
 //FilterGood
 ROOT::VecOps::RVec<unsigned int> selectGoodIdx(ROOT::VecOps::RVec<int>& goodIdxs){
 
